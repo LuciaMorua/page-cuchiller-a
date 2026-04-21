@@ -1,0 +1,85 @@
+.nav {
+  background: #5C1A0F;
+  border-bottom: 1px solid #7A2A1A;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.logoImg {
+  height: 36px;
+  width: 36px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+.links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navBtn {
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.navBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.navBtn:last-child {
+  background: #E05A00;
+  color: #fff;
+  padding: 6px 16px;
+}
+
+.navBtn:last-child:hover {
+  opacity: 0.85;
+  background: #E05A00;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .nav { padding: 0 1rem; }
+  .logoText { display: none; }
+  .navBtn { font-size: 13px; padding: 5px 8px; }
+}
+
+@media (max-width: 420px) {
+  .links { gap: 0; }
+  .navBtn { font-size: 12px; padding: 5px 6px; }
+}

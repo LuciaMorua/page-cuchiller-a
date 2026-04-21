@@ -1,0 +1,103 @@
+.header {
+  padding: 3rem 2rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.header p { color: var(--muted); font-size: 15px; }
+
+.grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem 3rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.emptyIcon { font-size: 48px; margin-bottom: 1rem; }
+
+/* ── SECCIONES ── */
+.section {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 5rem 2rem;
+}
+
+.contactSection {
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  padding: 5rem 2rem;
+}
+
+.sectionInner {
+  max-width: 680px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.sectionTag {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 12px;
+}
+
+.sectionTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 400;
+  color: var(--text);
+  margin: 0 0 1.5rem;
+  line-height: 1.2;
+}
+
+.sectionText {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 1rem;
+}
+
+.whatsappBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 1.5rem;
+  background: #25D366;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: 100px;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.whatsappBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 600px) {
+  .header, .grid { padding-left: 1rem; padding-right: 1rem; }
+  .section, .contactSection { padding: 3.5rem 1rem; }
+}

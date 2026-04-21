@@ -1,0 +1,17 @@
+.footer {
+  background: #3D0F08;
+  border-top: 1px solid #7A2A1A;
+  padding: 20px 2rem;
+  text-align: center;
+}
+
+.text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.name {
+  color: rgba(255, 255, 255, 0.7);
+}
