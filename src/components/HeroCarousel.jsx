@@ -76,13 +76,37 @@ export default function HeroCarousel({ isAdmin = false }) {
   }
 
   async function handleDelete(id, url) {
-    if (!confirm('¿Eliminar esta imagen del carrusel?')) return
-    const fileName = url.split('/').pop()
-    await supabase.storage.from('hero-images').remove([fileName])
-    await supabase.from('hero_slides').delete().eq('id', id)
+  if (!confirm('¿Eliminar esta imagen del carrusel?')) return
+
+  try {
+    // Obtener path real del archivo
+    const path = url.split('/hero-images/')[1]
+
+    // Borrar del storage
+    if (path) {
+      const { error: storageError } = await supabase.storage
+        .from('hero-images')
+        .remove([path])
+
+      if (storageError) throw storageError
+    }
+
+    // Borrar de la base de datos
+    const { error: dbError } = await supabase
+      .from('hero_slides')
+      .delete()
+      .eq('id', id)
+
+    if (dbError) throw dbError
+
     setCurrent(0)
     fetchSlides()
+
+  } catch (error) {
+    console.error(error)
+    alert('Error al eliminar imagen')
   }
+}
 
   async function saveSlogan() {
     await supabase

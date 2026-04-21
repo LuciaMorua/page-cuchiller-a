@@ -39,6 +39,7 @@ export default function Admin() {
         .from('products')
         .select('*')
         .order('created_at', { ascending: false })
+
       if (!ignore) {
         setProducts(data || [])
         setLoadingProducts(false)
@@ -54,9 +55,15 @@ export default function Admin() {
       setLoginError('Completá email y contraseña')
       return
     }
+
     setLoggingIn(true)
     setLoginError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+
     if (error) {
       setLoginError('Email o contraseña incorrectos')
       setLoggingIn(false)
@@ -75,37 +82,91 @@ export default function Admin() {
       .eq('id', product.id)
       .select()
       .single()
-    if (data) setProducts(prev => prev.map(p => p.id === data.id ? data : p))
+
+    if (data) {
+      setProducts(prev =>
+        prev.map(p => p.id === data.id ? data : p)
+      )
+    }
   }
 
   async function deleteProduct(id) {
     if (!confirm('¿Eliminar este producto?')) return
-    await supabase.from('products').delete().eq('id', id)
-    setProducts(prev => prev.filter(p => p.id !== id))
+
+    try {
+      const { data: product, error: fetchError } = await supabase
+        .from('products')
+        .select('image_url')
+        .eq('id', id)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      if (product?.image_url) {
+        const path = product.image_url.split('/productos/')[1]
+
+        if (path) {
+          const { error: storageError } = await supabase.storage
+            .from('productos')
+            .remove([path])
+
+          if (storageError) throw storageError
+        }
+      }
+
+      const { error: deleteError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id)
+
+      if (deleteError) throw deleteError
+
+      setProducts(prev => prev.filter(p => p.id !== id))
+
+    } catch (error) {
+      console.error(error)
+      alert('Error al eliminar producto')
+    }
   }
 
-  function openAdd() { setEditingProduct(null); setModalOpen(true) }
-  function openEdit(product) { setEditingProduct(product); setModalOpen(true) }
+  function openAdd() {
+    setEditingProduct(null)
+    setModalOpen(true)
+  }
+
+  function openEdit(product) {
+    setEditingProduct(product)
+    setModalOpen(true)
+  }
 
   function onSaved(saved) {
     setProducts(prev => {
       const exists = prev.find(p => p.id === saved.id)
-      return exists ? prev.map(p => p.id === saved.id ? saved : p) : [saved, ...prev]
+
+      return exists
+        ? prev.map(p => p.id === saved.id ? saved : p)
+        : [saved, ...prev]
     })
+
     setModalOpen(false)
   }
 
   if (loadingSession) {
-    return <div className={styles.loading} style={{ padding: '4rem', textAlign: 'center' }}>Cargando...</div>
+    return (
+      <div className={styles.loading}
+        style={{ padding: '4rem', textAlign: 'center' }}>
+        Cargando...
+      </div>
+    )
   }
 
-  // ── LOGIN ──
   if (!session) {
     return (
       <div className={styles.loginWrap}>
         <div className={styles.loginCard}>
           <h2>Panel de vendedor</h2>
           <p>Ingresá con tu cuenta para gestionar el stock</p>
+
           <div className={styles.formGroup}>
             <label>Email</label>
             <input
@@ -116,6 +177,7 @@ export default function Admin() {
               onKeyDown={e => e.key === 'Enter' && login()}
             />
           </div>
+
           <div className={styles.formGroup}>
             <label>Contraseña</label>
             <input
@@ -126,10 +188,18 @@ export default function Admin() {
               onKeyDown={e => e.key === 'Enter' && login()}
             />
           </div>
-          <button className={styles.btnPrimary} onClick={login} disabled={loggingIn}>
+
+          <button
+            className={styles.btnPrimary}
+            onClick={login}
+            disabled={loggingIn}
+          >
             {loggingIn ? 'Ingresando...' : 'Ingresar'}
           </button>
-          {loginError && <p className={styles.errorMsg}>{loginError}</p>}
+
+          {loginError && (
+            <p className={styles.errorMsg}>{loginError}</p>
+          )}
         </div>
       </div>
     )
@@ -139,51 +209,61 @@ export default function Admin() {
   const outStock = products.filter(p => !p.in_stock).length
   const cats = new Set(products.map(p => p.category)).size
 
-  // ── PANEL ADMIN ──
   return (
     <div className={styles.wrap}>
+
       <div className={styles.adminHeader}>
         <div>
           <h2>Gestión de productos</h2>
           <p>{session.user.email}</p>
         </div>
+
         <div className={styles.headerActions}>
-          <button className={styles.btnAdd} onClick={openAdd}>+ Nuevo producto</button>
-          <button className={styles.btnLogout} onClick={logout}>Cerrar sesión</button>
+          <button className={styles.btnAdd} onClick={openAdd}>
+            + Nuevo producto
+          </button>
+
+          <button className={styles.btnLogout} onClick={logout}>
+            Cerrar sesión
+          </button>
         </div>
       </div>
 
-      {/* ── CARRUSEL HERO (admin) ── */}
       <HeroCarousel isAdmin={true} />
 
-      {/* ── STATS ── */}
       <div className={styles.stats}>
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Total</div>
           <div className={styles.statNum}>{products.length}</div>
         </div>
+
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Con stock</div>
-          <div className={`${styles.statNum} ${styles.green}`}>{inStock}</div>
+          <div className={`${styles.statNum} ${styles.green}`}>
+            {inStock}
+          </div>
         </div>
+
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Sin stock</div>
-          <div className={`${styles.statNum} ${styles.red}`}>{outStock}</div>
+          <div className={`${styles.statNum} ${styles.red}`}>
+            {outStock}
+          </div>
         </div>
+
         <div className={styles.statCard}>
           <div className={styles.statLabel}>Categorías</div>
           <div className={styles.statNum}>{cats}</div>
         </div>
       </div>
 
-      {/* ── TABLA DE PRODUCTOS ── */}
       <div className={styles.tableWrap}>
         {loadingProducts ? (
           <div className={styles.loading}>Cargando...</div>
         ) : products.length === 0 ? (
           <div className={styles.empty}>
             <div>📦</div>
-            <p>Aún no tenés productos. ¡Agregá el primero!</p>
+            <p>Aún no tenés productos</p>
           </div>
         ) : (
           <table className={styles.table}>
@@ -197,36 +277,73 @@ export default function Admin() {
                 <th>Acciones</th>
               </tr>
             </thead>
+
             <tbody>
               {products.map(p => (
                 <tr key={p.id}>
                   <td>
                     {p.image_url ? (
-                      <img src={p.image_url} alt={p.name} className={styles.thumb} />
+                      <img
+                        src={p.image_url}
+                        alt={p.name}
+                        className={styles.thumb}
+                      />
                     ) : (
                       <div className={styles.thumbEmpty}>📷</div>
                     )}
                   </td>
+
                   <td>
                     <div className={styles.rowName}>{p.name}</div>
-                    <div className={styles.rowDesc}>{p.description?.substring(0, 45)}...</div>
+                    <div className={styles.rowDesc}>
+                      {p.description?.substring(0, 45)}...
+                    </div>
                   </td>
-                  <td><span className={styles.catTag}>{p.category}</span></td>
-                  <td className={styles.rowPrice}>${p.price.toLocaleString('es-AR')}</td>
+
+                  <td>
+                    <span className={styles.catTag}>
+                      {p.category}
+                    </span>
+                  </td>
+
+                  <td className={styles.rowPrice}>
+                    ${p.price.toLocaleString('es-AR')}
+                  </td>
+
                   <td>
                     <label className={styles.toggle}>
-                      <input type="checkbox" checked={p.in_stock} onChange={() => toggleStock(p)} />
+                      <input
+                        type="checkbox"
+                        checked={p.in_stock}
+                        onChange={() => toggleStock(p)}
+                      />
                       <div className={styles.track}></div>
                       <div className={styles.thumb}></div>
                     </label>
-                    <div className={`${styles.stockLabel} ${p.in_stock ? styles.green : styles.red}`}>
+
+                    <div className={`${styles.stockLabel} ${
+                      p.in_stock ? styles.green : styles.red
+                    }`}>
                       {p.in_stock ? 'Con stock' : 'Sin stock'}
                     </div>
                   </td>
+
                   <td>
-                    <button className={styles.btnEdit} onClick={() => openEdit(p)}>Editar</button>
-                    <button className={styles.btnDelete} onClick={() => deleteProduct(p.id)}>Eliminar</button>
+                    <button
+                      className={styles.btnEdit}
+                      onClick={() => openEdit(p)}
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      className={styles.btnDelete}
+                      onClick={() => deleteProduct(p.id)}
+                    >
+                      Eliminar
+                    </button>
                   </td>
+
                 </tr>
               ))}
             </tbody>
@@ -241,6 +358,7 @@ export default function Admin() {
           onSaved={onSaved}
         />
       )}
+
     </div>
   )
 }
