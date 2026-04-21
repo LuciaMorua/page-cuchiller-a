@@ -98,7 +98,7 @@ export default function Store() {
             Escribinos directamente por WhatsApp.
           </p>
           <a
-            href={`https://wa.me/${WHATSAPP}?text=Hola%2C%20me%20interesa%20un%20cuchillo%20artesanal`}
+            href={`https://wa.me/${5493406506364}?text=Hola%2C%20me%20interesa%20un%20cuchillo%20artesanal`}
             target="_blank"
             rel="noopener noreferrer"
             className={styles.whatsappBtn}

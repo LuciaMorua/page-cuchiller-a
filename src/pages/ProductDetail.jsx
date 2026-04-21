@@ -3,10 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import styles from './ProductDetail.module.css'
 
-// ↓↓↓ CAMBIÁ ESTE NÚMERO POR EL DE WHATSAPP DEL VENDEDOR ↓↓↓
-const WHATSAPP_NUMBER = '5491112345678'
-// El formato es: código de país sin + (54 = Argentina) + número sin 0 ni 15
-// Ejemplo Argentina: 5491112345678 (54 + 911 + 12345678)
+
+const WHATSAPP_NUMBER = '5493406506364'
 
 export default function ProductDetail() {
   const { id } = useParams()
