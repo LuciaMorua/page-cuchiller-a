@@ -10,7 +10,8 @@ export default defineConfig({
       dynamicRoutes: [
         '/',
         '/producto',
-      ]
+      ],
+      exclude: ['/google9fb738b89bd1fcb1']
     })
   ],
 })
