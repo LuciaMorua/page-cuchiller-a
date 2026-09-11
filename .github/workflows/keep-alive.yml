@@ -2,7 +2,7 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: '0 12 * * 1'
+    - cron: '0 */6 * * *'  # Cada 6 horas (4 veces al día)
   workflow_dispatch:
 
 jobs:
@@ -11,7 +11,20 @@ jobs:
     steps:
       - name: Ping Supabase database
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/products?select=id&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | head -n-1)
+          
+          echo "Response: $BODY"
+          echo "HTTP Code: $HTTP_CODE"
+          
+          if [[ $HTTP_CODE != 200 ]]; then
+            echo "Error: API returned $HTTP_CODE"
+            exit 1
+          fi
+          
+          echo "✅ Supabase keep-alive successful"
