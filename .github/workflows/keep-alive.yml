@@ -15,16 +15,24 @@ jobs:
             "${{ secrets.SUPABASE_URL }}/rest/v1/products?select=id&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}")
-          
+
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | head -n-1)
-          
+
           echo "Response: $BODY"
           echo "HTTP Code: $HTTP_CODE"
-          
+
           if [[ $HTTP_CODE != 200 ]]; then
             echo "Error: API returned $HTTP_CODE"
             exit 1
           fi
-          
+
           echo "✅ Supabase keep-alive successful"
+
+  keepalive-repo:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gautamkrishnar/keepalive-workflow@v2
